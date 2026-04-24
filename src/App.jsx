@@ -14,13 +14,13 @@ import Testpage from './pages/Test-Page/Testpage';
 import Requests from './pages/Requests/Requests';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import Privacy from './pages/Privacy/Privacy';
 
 
 const App = () => {
   return (
     <div>
       <Header/>
-      <Footer/>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/contact' element={<Contact/>}/>
@@ -34,7 +34,9 @@ const App = () => {
         <Route path='/register' element={<Register/>}/>
         <Route path='/requests' element={<Requests/>}/>
         <Route path='/testpage' element={<Testpage/>}/>
+        <Route path='/privacy' element={<Privacy/>}/>
       </Routes>
+      <Footer/>
     </div>
   )
 }
