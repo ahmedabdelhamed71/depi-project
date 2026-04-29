@@ -100,7 +100,7 @@ return (
           </Link>
 
           <Link to="/register">
-            <button className="group px-4 py-2 bg-blue-500 rounded-2xl text-md text-black cursor-pointer active:scale-95 transition duration-300 hover:bg-blue-700">
+            <button className="group px-4 py-2 bg-blue-500 rounded-2xl text-md text-white cursor-pointer active:scale-95 transition duration-300 hover:bg-blue-700">
             <p className="relative h-6 overflow-hidden">
 
                 <span className="block transition-transform duration-300 group-hover:-translate-y-full">
