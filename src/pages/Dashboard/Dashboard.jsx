@@ -19,12 +19,12 @@ const currentUser = {
 const skillsOffered = [
   { id: 1, name: "React Development", level: "Advanced",     icon: MdCode,       color: "blue"   },
   { id: 2, name: "UI/UX Design",      level: "Intermediate", icon: MdBrush,      color: "purple" },
-  { id: 3, name: "Photography",        level: "Intermediate", icon: MdCamera,     color: "amber"  },
+  { id: 3, name: "Data Engineering",        level: "Intermediate", icon: MdCamera,     color: "amber"  },
 ];
 
 const skillsWanted = [
   { id: 1, name: "Spanish Language", level: "Beginner",      icon: MdLanguage,   color: "green" },
-  { id: 2, name: "Guitar Playing",   level: "Beginner",      icon: MdMusicNote,  color: "pink"  },
+  { id: 2, name: "Prompt Engineering",   level: "Beginner",      icon: MdMusicNote,  color: "pink"  },
   { id: 3, name: "Data Analysis",    level: "Intermediate",  icon: MdTrendingUp, color: "cyan"  },
 ];
 
