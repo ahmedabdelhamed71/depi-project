@@ -39,7 +39,7 @@ const Login = () => {
       savedUser.password === loginInfo.password
     ) {
       setError("");
-      navigate("/"); // 🔥 يروح للـ Home
+      navigate("/");
     } else {
       setError("Invalid email or password");
     }
