@@ -4,7 +4,7 @@ import { MdOutlineSwapCalls } from "react-icons/md";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-white p-8 border-t border-gray-200">
+    <footer className="pt-6 pb-4 px-6 bg-white border-t border-gray-100">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-10">
         <div className="flex gap-3 max-w-sm items-center">
           <MdOutlineSwapCalls
