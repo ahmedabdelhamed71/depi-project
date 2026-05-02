@@ -36,7 +36,7 @@ const Home = () => {
     <div className='container pt-20 pb-10 mx-auto'>
       <section className='flex flex-row justify-evenly items-center mx-auto'>
         <div className='flex flex-col'>
-          <div className='flex flex-col text-4xl font-bold'>
+          <div className='flex flex-col text-5xl font-bold gap-2'>
             <h1>Learn Skills.</h1>
             <h1>Teach Skills.</h1>
             <h1>Swap Growth.</h1>
@@ -49,9 +49,7 @@ const Home = () => {
             <Button variant='outlined'>How It Works</Button>
           </div>
         </div>
-        {/* <div className='flex justify-content-end'> */}
-        <img src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVvcGxlJTIwbGVhcm5pbmd8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60' alt='home' className='rounded-lg object-cover max-w-[100%] w-[35%]' />
-        {/* </div> */}
+        <img src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVvcGxlJTIwbGVhcm5pbmd8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60' alt='home' className='rounded-3xl object-cover max-w-[100%] w-[35%]' />
         <div>
 
         </div>
