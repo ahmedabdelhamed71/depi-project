@@ -1,106 +1,121 @@
 import React from 'react'
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-const Login = () => {
-   const navigate = useNavigate();
+import { MdOutlineSwapCalls } from "react-icons/md";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
-  const [loginInfo, setLoginInfo] = useState({
-    email: "",
-    password: "",
+const Schema = yup.object({
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Email is not valid"),
+
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
+
+const Login = () => {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(Schema),
   });
 
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setLoginInfo({
-      ...loginInfo,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    if (loginInfo.email.trim() === "" || loginInfo.password.trim() === "") {
-      setError("Please fill all fields");
-      return;
-    }
-
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-
-    if (!savedUser) {
-      setError("No account found, please register first");
-      return;
-    }
-
-    if (
-      savedUser.email === loginInfo.email &&
-      savedUser.password === loginInfo.password
-    ) {
-      setError("");
-      navigate("/"); // 🔥 يروح للـ Home
-    } else {
-      setError("Invalid email or password");
-    }
+  const userSubmit = (data) => {
+    console.log(data);
+    navigate("/");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      
-      <form 
-        onSubmit={handleLogin}
-        className="bg-white text-gray-500 max-w-[350px] mx-4 md:p-6 p-4 text-left text-sm rounded-xl shadow-[0px_0px_10px_0px] shadow-black/10"
+      <form
+        onSubmit={handleSubmit(userSubmit)}
+        className="bg-white text-gray-500 w-full max-w-[430px] mx-4 md:p-8 p-6 py-10 text-left text-sm rounded-lg shadow-[0px_0px_10px_0px] shadow-black/10"
       >
-        
-        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
-          Login Now
-        </h2>
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <MdOutlineSwapCalls className="text-indigo-600 text-3xl" />
+
+          <h2 className="text-2xl font-bold text-gray-800">
+            SkillSwap
+          </h2>
+        </div>
+
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
+          Welcome Back
+        </h1>
+
+        <h6 className="text-sm font-normal text-center text-gray-400 mb-6">
+          Log in to continue your learning journey
+        </h6>
+
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
 
         <input
-          name="email"
-          value={loginInfo.email}
-          onChange={handleChange}
-          className="w-full border my-3 border-gray-500/30 outline-none rounded-full py-2.5 px-4"
+          {...register("email")}
+          className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
           type="email"
-          placeholder="Enter your email"
+          placeholder="you@example.com"
         />
 
+        {errors.email && (
+          <p className="text-red-500 text-xs mb-2">
+            {errors.email.message}
+          </p>
+        )}
+
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
+
         <input
-          name="password"
-          value={loginInfo.password}
-          onChange={handleChange}
-          className="w-full border mt-1 border-gray-500/30 outline-none rounded-full py-2.5 px-4"
+          {...register("password")}
+          className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
           type="password"
           placeholder="Enter your password"
         />
 
-        <div className="text-right py-4">
-          <Link to="/wrong-page" className="text-blue-600 underline">
-            Forgot Password
-          </Link>
-        </div>
-
-        {error && (
-          <p className="text-red-500 text-center mb-3">
-            {error}
+        {errors.password && (
+          <p className="text-red-500 text-xs mb-2">
+            {errors.password.message}
           </p>
         )}
+        <div className="flex items-center justify-between mb-4">
+  <label className="flex items-center gap-2 text-sm text-gray-600">
+    <input
+      type="checkbox"
+      className="w-4 h-4 accent-indigo-500"
+    />
+    Remember me
+  </label>
+
+  <Link to='*' className="text-indigo-600 hover:underline">
+    Forgot password?
+  </Link>
+</div>
 
         <button
           type="submit"
-          className="w-full mb-3 bg-indigo-500 hover:bg-indigo-600/90 active:scale-95 transition py-2.5 rounded-full text-white"
+          className="w-full mb-3 bg-indigo-500 hover:bg-indigo-600 transition-all active:scale-95 py-2.5 rounded text-white font-medium"
         >
-          Log in
+          Log In
         </button>
 
         <p className="text-center mt-4">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link to="/register" className="text-blue-500 underline">
-            Sign up Now
+            Sign up
           </Link>
         </p>
-
       </form>
     </div>
   );
