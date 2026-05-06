@@ -1,102 +1,132 @@
 import React from 'react'
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-const Register = () => {
-const navigate = useNavigate();
+import { MdOutlineSwapCalls } from "react-icons/md";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
-  const [userInfo, setUserInfo] = useState({
-    username: "",
-    email: "",
-    password: "",
+const Schema = yup.object({
+  username: yup.string().required("Full name is required"),
+
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Email is not valid"),
+
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters"),
+
+  confirmPassword: yup
+    .string()
+    .required("Confirm password is required")
+    .oneOf([yup.ref("password")], "Passwords must match"),
+});
+
+const Register = () => {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(Schema),
   });
 
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setUserInfo({
-      ...userInfo,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const userSubmit = (e) => {
-    e.preventDefault();
-
-    if (userInfo.username.trim() === "") {
-      setError("Username is required");
-      return;
-    }
-
-    if (userInfo.email.trim() === "") {
-      setError("Email is required");
-      return;
-    }
-
-    if (!userInfo.email.includes("@")) {
-      setError("Email is not valid");
-      return;
-    }
-
-    if (userInfo.password.trim() === "") {
-      setError("Password is required");
-      return;
-    }
-
-    if (userInfo.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
-    setError("");
-
-    localStorage.setItem("user", JSON.stringify(userInfo));
-
+  const userSubmit = (data) => {
+    console.log(data);
     navigate("/login");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-
-      <form 
-        onSubmit={userSubmit}
-        className="bg-white text-gray-500 w-full max-w-[340px] mx-4 md:p-6 p-4 py-8 text-left text-sm rounded-lg shadow-[0px_0px_10px_0px] shadow-black/10"
+      <form
+        onSubmit={handleSubmit(userSubmit)}
+        className="bg-white text-gray-500 w-full max-w-[430px] mx-4 md:p-8 p-6 py-10 text-left text-sm rounded-lg shadow-[0px_0px_10px_0px] shadow-black/10"
       >
-        
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Sign Up
-        </h2>
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <MdOutlineSwapCalls className="text-indigo-600 text-3xl" />
+
+          <h2 className="text-2xl font-bold text-gray-800">
+            SkillSwap
+          </h2>
+        </div>
+
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
+          Create Account
+        </h1>
+
+        <h6 className="text-sm font-normal text-center text-gray-400 mb-6">
+          Join the community and start swapping skills
+        </h6>
+
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Full Name
+        </label>
 
         <input
-          name="username"
-          value={userInfo.username}
-          onChange={handleChange}
-          className="w-full border mt-1 bg-indigo-500/5 mb-2 border-gray-500/10 outline-none rounded py-2.5 px-3"
-          type="text"
-          placeholder="Username"
+          {...register("username")}
+          className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
+          placeholder="Enter your full name"
         />
 
+        {errors.username && (
+          <p className="text-red-500 text-xs mb-2">
+            {errors.username.message}
+          </p>
+        )}
+
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
+
         <input
-          name="email"
-          value={userInfo.email}
-          onChange={handleChange}
-          className="w-full border mt-1 bg-indigo-500/5 mb-2 border-gray-500/10 outline-none rounded py-2.5 px-3"
+          {...register("email")}
+          className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
           type="email"
-          placeholder="Email"
+          placeholder="you@example.com"
         />
+
+        {errors.email && (
+          <p className="text-red-500 text-xs mb-2">
+            {errors.email.message}
+          </p>
+        )}
+
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
 
         <input
-          name="password"
-          value={userInfo.password}
-          onChange={handleChange}
-          className="w-full border mt-1 bg-indigo-500/5 mb-7 border-gray-500/10 outline-none rounded py-2.5 px-3"
+          {...register("password")}
+          className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
           type="password"
-          placeholder="Password"
+          placeholder="Create a password"
         />
 
-        {error && (
-          <p className="text-red-500 text-center mb-3">
-            {error}
+        {errors.password && (
+          <p className="text-red-500 text-xs mb-2">
+            {errors.password.message}
+          </p>
+        )}
+
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Confirm Password
+        </label>
+
+        <input
+          {...register("confirmPassword")}
+          className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
+          type="password"
+          placeholder="Confirm your password"
+        />
+
+        {errors.confirmPassword && (
+          <p className="text-red-500 text-xs mb-2">
+            {errors.confirmPassword.message}
           </p>
         )}
 
@@ -113,11 +143,8 @@ const navigate = useNavigate();
             Login
           </Link>
         </p>
-
       </form>
     </div>
   );
 };
-
-
 export default Register
