@@ -15,6 +15,7 @@ import Requests from './pages/Requests/Requests';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Privacy from './pages/Privacy/Privacy';
+import { AuthContext } from './pages/context/context';
 
 const App = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const App = () => {
   const showLayout = !noLayoutPages.includes(location.pathname);
 
   return (
+      <AuthContext>
     <div>
       <Header/>
       <Routes>
@@ -43,7 +45,9 @@ const App = () => {
       </Routes>
       {showLayout && <Footer />}
     </div>
+    </AuthContext>
   )
 }
+
 
 export default App

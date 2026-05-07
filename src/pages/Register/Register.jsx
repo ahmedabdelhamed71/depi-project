@@ -35,11 +35,26 @@ const Register = () => {
   } = useForm({
     resolver: yupResolver(Schema),
   });
+const userSubmit = async (data) => {
+  try {
+    const req = await fetch("https://dummyjson.com/users/add", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName: data.username,
+        email: data.email,
+        password: data.password,
+      }),
+    });
 
-  const userSubmit = (data) => {
-    console.log(data);
+    const result = await req.json();
+
+    console.log(result);
     navigate("/login");
-  };
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

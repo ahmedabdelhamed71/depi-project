@@ -5,12 +5,15 @@ import { MdOutlineSwapCalls } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useAuth } from "../context/context";
+
 
 const Schema = yup.object({
   email: yup
     .string()
-    .required("Email is required")
-    .email("Email is not valid"),
+    //.required("Email is required")
+    //.email("Email is not valid"),
+   .required("Username is required"),
 
   password: yup
     .string()
@@ -20,6 +23,7 @@ const Schema = yup.object({
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const {
     register,
@@ -29,10 +33,25 @@ const Login = () => {
     resolver: yupResolver(Schema),
   });
 
-  const userSubmit = (data) => {
-    console.log(data);
+  const userSubmit = async (data) => {
+  try {
+    const req = await fetch("https://dummyjson.com/user/login", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: data.email,
+        password: data.password,
+      }),
+    });
+
+    const { accessToken } = await req.json();
+
+    login(accessToken);
     navigate("/");
-  };
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -63,7 +82,7 @@ const Login = () => {
         <input
           {...register("email")}
           className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
-          type="email"
+          type="text"
           placeholder="you@example.com"
         />
 
