@@ -11,6 +11,10 @@ import Notfound from './pages/Not-Found/Notfound';
 import Profile from './pages/Profile/Profile';
 import Register from './pages/Register/Register';
 import Testpage from './pages/Test-Page/Testpage';
+import SearchSkill from './pages/Test-Page/SearchSkill';
+import TestSelection from './pages/Test-Page/TestSelection';
+import SkillTest from './pages/Test-Page/SkillTest';
+import Result from './pages/Test-Page/Result';
 import Requests from './pages/Requests/Requests';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
@@ -33,7 +37,11 @@ const App = () => {
         <Route path='/profile' element={<Profile/>}/>
         <Route path='/register' element={<Register/>}/>
         <Route path='/requests' element={<Requests/>}/>
-        <Route path='/testpage' element={<Testpage/>}/>
+        <Route path='/testpage' element={<Testpage/>}/> 
+        <Route path="/search-skill" element={<SearchSkill />} />
+        <Route path="/test-selection" element={<TestSelection />} />
+        <Route path="/test" element={<SkillTest />} />
+        <Route path="/result" element={<Result />} />
       </Routes>
     </div>
   )
