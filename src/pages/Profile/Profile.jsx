@@ -371,9 +371,12 @@ const Profile = () => {
                   </button>
                 </div>
               ))}
-              <button className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 rounded-xl text-sm text-gray-400 hover:text-blue-500 transition-all">
-                <MdAdd className="text-lg" /> Add New Skill
-              </button>
+             <Link
+                 to="/search-skill"
+                 className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 rounded-xl text-sm text-gray-400 hover:text-blue-500 transition-all">
+            <MdAdd className="text-lg" />
+               Add New Skill
+                </Link>
             </div>
           </div>
 
@@ -409,9 +412,12 @@ const Profile = () => {
                   </button>
                 </div>
               ))}
-              <button className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-violet-300 rounded-xl text-sm text-gray-400 hover:text-violet-500 transition-all">
-                <MdAdd className="text-lg" /> Add Skill to Learn
-              </button>
+             <Link
+             to="/discover"
+             className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-violet-300 rounded-xl text-sm text-gray-400 hover:text-violet-500 transition-all">
+             <MdAdd className="text-lg" />
+             Add Skill to Learn
+            </Link>
             </div>
           </div>
         </div>

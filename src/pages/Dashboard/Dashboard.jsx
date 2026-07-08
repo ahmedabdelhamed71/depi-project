@@ -148,8 +148,8 @@ const QuickActions = () => (
     <h3 className="font-semibold text-gray-900 text-sm mb-4">Quick Actions</h3>
     <div className="space-y-2">
       {[
-        { label: "Add a New Skill", icon: MdAdd,     sub: "Share what you know", to: "/search-skill",  primary: true  },
-        { label: "Take Skill Test", icon: MdSchool,  sub: "Verify your level",   to: "/testpage",     primary: false },
+        { label: "Add a New Skill", icon: MdAdd,     sub: "Share what you know", to: "/profile",  primary: true  },
+        { label: "Take Skill Test", icon: MdSchool,  sub: "Verify your level",   to: "/search-skill",     primary: false },
         { label: "Go to Discover",  icon: MdExplore, sub: "Find skill matches",  to: "/discover", primary: false },
       ].map(({ label, icon: Icon, sub, to, primary }) => (
         <Link
@@ -390,7 +390,7 @@ const Dashboard = () => {
               <h1 className="text-xl font-bold text-gray-900">Good morning, {currentUser.name.split(" ")[0]} 👋</h1>
               <p className="text-sm text-gray-500 mt-0.5">You have {requests.length} pending swap requests</p>
             </div>
-            <Link to="/search-skill" className="hidden sm:flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-sm">
+            <Link to="/profile" className="hidden sm:flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-sm">
               <MdAdd className="text-lg" /> Add Skill
             </Link>
           </div>
