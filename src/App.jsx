@@ -20,6 +20,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Privacy from './pages/Privacy/Privacy';
 import { AuthContext } from './pages/context/context';
+import HowItWorks from './pages/How-It-Works/HowItWorks';
 
 const App = () => {
   const location = useLocation();
@@ -64,6 +65,7 @@ const App = () => {
         <Route path='/requests' element={<Requests />} />
         <Route path='/testpage' element={<Testpage />} />
         <Route path='/privacy' element={<Privacy />} />
+        <Route path='/how-it-works' element={<HowItWorks />} />
 
       </Routes>
       {showLayout && <Footer />}
