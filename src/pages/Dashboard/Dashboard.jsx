@@ -191,7 +191,7 @@ const StatsCard = () => (
           </div>
         </div>
       ))}
-    </div> s
+    </div> 
   </div>
 );
 
