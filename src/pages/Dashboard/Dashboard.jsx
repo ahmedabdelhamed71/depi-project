@@ -149,7 +149,7 @@ const QuickActions = () => (
     <div className="space-y-2">
       {[
         { label: "Add a New Skill", icon: MdAdd,     sub: "Share what you know", to: "/profile",  primary: true  },
-        { label: "Take Skill Test", icon: MdSchool,  sub: "Verify your level",   to: "/testpage",     primary: false },
+        { label: "Take Skill Test", icon: MdSchool,  sub: "Verify your level",   to: "/search-skill",     primary: false },
         { label: "Go to Discover",  icon: MdExplore, sub: "Find skill matches",  to: "/discover", primary: false },
       ].map(({ label, icon: Icon, sub, to, primary }) => (
         <Link
@@ -191,7 +191,7 @@ const StatsCard = () => (
           </div>
         </div>
       ))}
-    </div>
+    </div> 
   </div>
 );
 
@@ -199,7 +199,7 @@ const SkillsSection = ({ skillTab, setSkillTab }) => (
   <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
     <div className="flex items-center justify-between mb-4">
       <h3 className="font-semibold text-gray-900">My Skills</h3>
-      <Link to="/profile" className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium">
+      <Link to="/search-skill"className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium">
         <MdAdd /> Add Skill
       </Link>
     </div>
@@ -218,7 +218,7 @@ const SkillsSection = ({ skillTab, setSkillTab }) => (
       {(skillTab === "offer" ? skillsOffered : skillsWanted).map(skill => (
         <SkillCard key={skill.id} skill={skill} />
       ))}
-      <Link to="/profile" className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 rounded-xl transition-all group">
+      <Link to="/search-skill" className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 rounded-xl transition-all group">
         <div className="w-9 h-9 rounded-lg bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
           <MdAdd className="text-gray-400 group-hover:text-blue-500 text-lg" />
         </div>
