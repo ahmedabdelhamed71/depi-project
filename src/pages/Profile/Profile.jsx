@@ -1,7 +1,5 @@
-// Profile.jsx - Public Profile Page with Edit Functionality
-// Displays user information, skills, ratings, achievements, and swap history
-// Includes an edit mode to modify profile details
-// Props are used for dynamic data; falls back to mock data when not provided
+//Public Profile Page
+
 
 import { useState } from "react";
 import {

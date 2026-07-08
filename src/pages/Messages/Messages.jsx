@@ -1,7 +1,4 @@
-// Messages.jsx - Chat interface for SkillSwap
-// Handles real-time-like messaging between users
-// Props allow dynamic data from parent or API; falls back to mock data
-// Supports marking messages as read when a chat is opened
+// Messages
 
 import { useState, useEffect, useCallback } from "react";
 import {
