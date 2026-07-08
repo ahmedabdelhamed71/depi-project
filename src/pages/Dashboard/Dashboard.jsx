@@ -148,7 +148,7 @@ const QuickActions = () => (
     <h3 className="font-semibold text-gray-900 text-sm mb-4">Quick Actions</h3>
     <div className="space-y-2">
       {[
-        { label: "Add a New Skill", icon: MdAdd,     sub: "Share what you know", to: "/profile",  primary: true  },
+        { label: "Add a New Skill", icon: MdAdd,     sub: "Share what you know", to: "/search-skill",  primary: true  },
         { label: "Take Skill Test", icon: MdSchool,  sub: "Verify your level",   to: "/testpage",     primary: false },
         { label: "Go to Discover",  icon: MdExplore, sub: "Find skill matches",  to: "/discover", primary: false },
       ].map(({ label, icon: Icon, sub, to, primary }) => (
@@ -191,7 +191,7 @@ const StatsCard = () => (
           </div>
         </div>
       ))}
-    </div>
+    </div> s
   </div>
 );
 
@@ -199,7 +199,7 @@ const SkillsSection = ({ skillTab, setSkillTab }) => (
   <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
     <div className="flex items-center justify-between mb-4">
       <h3 className="font-semibold text-gray-900">My Skills</h3>
-      <Link to="/profile" className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium">
+      <Link to="/search-skill"className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium">
         <MdAdd /> Add Skill
       </Link>
     </div>
@@ -218,7 +218,7 @@ const SkillsSection = ({ skillTab, setSkillTab }) => (
       {(skillTab === "offer" ? skillsOffered : skillsWanted).map(skill => (
         <SkillCard key={skill.id} skill={skill} />
       ))}
-      <Link to="/profile" className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 rounded-xl transition-all group">
+      <Link to="/search-skill" className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 rounded-xl transition-all group">
         <div className="w-9 h-9 rounded-lg bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
           <MdAdd className="text-gray-400 group-hover:text-blue-500 text-lg" />
         </div>
@@ -390,7 +390,7 @@ const Dashboard = () => {
               <h1 className="text-xl font-bold text-gray-900">Good morning, {currentUser.name.split(" ")[0]} 👋</h1>
               <p className="text-sm text-gray-500 mt-0.5">You have {requests.length} pending swap requests</p>
             </div>
-            <Link to="/profile" className="hidden sm:flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-sm">
+            <Link to="/search-skill" className="hidden sm:flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-sm">
               <MdAdd className="text-lg" /> Add Skill
             </Link>
           </div>
