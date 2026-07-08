@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from "react-router-dom";
 import { Aperture, BookOpen, Eye, Sparkles } from "lucide-react";
 
 const Aboutus = () => {
@@ -119,9 +120,12 @@ const Aboutus = () => {
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
             Whether you want to teach, learn, or both, SkillSwap is the perfect place to start your journey.
           </p>
-          <button className="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-blue-50 transition transform hover:scale-105">
+          <Link
+           to="/register"
+               className="inline-block bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-blue-50 transition transform hover:scale-105"
+               >
             Get Started Today
-          </button>
+          </Link>
         </div>
       </div>
     </div>
