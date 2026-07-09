@@ -25,54 +25,39 @@ import HowItWorks from './pages/How-It-Works/HowItWorks';
 const App = () => {
   const location = useLocation();
 
-  // الصفحات اللي مش عايز فيها Header و Footer
-  const noLayoutPages = ['/dashboard'];
+  const noLayoutPages = ["/dashboard"];
   const showLayout = !noLayoutPages.includes(location.pathname);
 
   return (
-      <AuthContext>
     <div>
-      <Header/>
-      <Routes>
+      {showLayout && <Header />}
 
-        <Route path='/' element={<Home/>}/>
-        <Route path='/contact' element={<Contact/>}/>
-        <Route path='/dashboard' element={<Dashboard/>}/>
-        <Route path='/aboutus' element={<Aboutus/>}/>
-        <Route path='/discover' element={<Discover/>}/>
-        <Route path='/login' element={<Login/>}/>
-        <Route path='/messages' element={<Messages/>}/>
-        <Route path='*' element={<Notfound/>}/>
-        <Route path='/profile' element={<Profile/>}/>
-        <Route path='/register' element={<Register/>}/>
-        <Route path='/requests' element={<Requests/>}/>
-        <Route path='/testpage' element={<Testpage/>}/> 
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/aboutus" element={<Aboutus />} />
+        <Route path="/discover" element={<Discover />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/requests" element={<Requests />} />
+        <Route path="/testpage" element={<Testpage />} />
         <Route path="/search-skill" element={<SearchSkill />} />
         <Route path="/test-selection" element={<TestSelection />} />
         <Route path="/test" element={<SkillTest />} />
         <Route path="/result" element={<Result />} />
-
-        <Route path='/' element={<Home />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/aboutus' element={<Aboutus />} />
-        <Route path='/discover' element={<Discover />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/messages' element={<Messages />} />
-        <Route path='*' element={<Notfound />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/requests' element={<Requests />} />
-        <Route path='/testpage' element={<Testpage />} />
-        <Route path='/privacy' element={<Privacy />} />
-        <Route path='/how-it-works' element={<HowItWorks />} />
-
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="*" element={<Notfound />} />
       </Routes>
+
       {showLayout && <Footer />}
     </div>
-    </AuthContext>
-  )
-}
+  );
+};
+
 
 
 export default App

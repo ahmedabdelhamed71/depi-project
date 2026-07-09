@@ -1,32 +1,55 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 const Context = createContext();
 
 export const AuthContext = ({ children }) => {
   const [logged, setLogged] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = (token) => {
+  const login = (userData) => {
     setLogged(true);
-
-    localStorage.tc = token;
-
-    const userData = jwtDecode(token);
     setUser(userData);
   };
 
-  const logout = () => {
-    setLogged(false);
+  const logout = async () => {
+    try {
+      await fetch("http://localhost:3000/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
 
-    localStorage.removeItem("tc");
-
-    setUser(null);
+      setLogged(false);
+      setUser(null);
+    } catch (e) {
+      console.log(e.message);
+    }
   };
 
   useEffect(() => {
-    if (localStorage.tc) {
-      login(localStorage.tc);
-    }
+    const checkUser = async () => {
+      try {
+        const req = await fetch("http://localhost:3000/api/auth/me", {
+          credentials: "include",
+        });
+
+        const res = await req.json();
+
+        if (req.ok) {
+          setLogged(true);
+          setUser(res.user);
+        } else {
+          setLogged(false);
+          setUser(null);
+        }
+      } catch (e) {
+        setLogged(false);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUser();
   }, []);
 
   return (
@@ -36,6 +59,7 @@ export const AuthContext = ({ children }) => {
         setLogged,
         user,
         setUser,
+        loading,
         login,
         logout,
       }}
@@ -47,6 +71,5 @@ export const AuthContext = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(Context);
-
   return context;
 };

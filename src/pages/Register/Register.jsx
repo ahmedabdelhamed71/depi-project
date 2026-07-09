@@ -35,26 +35,33 @@ const Register = () => {
   } = useForm({
     resolver: yupResolver(Schema),
   });
-const userSubmit = async (data) => {
-  try {
-    const req = await fetch("https://dummyjson.com/users/add", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName: data.username,
-        email: data.email,
-        password: data.password,
-      }),
-    });
 
-    const result = await req.json();
+  const userSubmit = async (data) => {
+    try {
+      const req = await fetch("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          password: data.password,
+        }),
+      });
 
-    console.log(result);
-    navigate("/login");
-  } catch (e) {
-    console.log(e.message);
-  }
-};
+      const result = await req.json();
+
+      if (!req.ok) {
+        console.log(result.msg);
+        return;
+      }
+
+      console.log(result);
+      navigate("/login");
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -65,9 +72,7 @@ const userSubmit = async (data) => {
         <div className="flex items-center justify-center gap-2 mb-4">
           <MdOutlineSwapCalls className="text-indigo-600 text-3xl" />
 
-          <h2 className="text-2xl font-bold text-gray-800">
-            SkillSwap
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">SkillSwap</h2>
         </div>
 
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
@@ -106,9 +111,7 @@ const userSubmit = async (data) => {
         />
 
         {errors.email && (
-          <p className="text-red-500 text-xs mb-2">
-            {errors.email.message}
-          </p>
+          <p className="text-red-500 text-xs mb-2">{errors.email.message}</p>
         )}
 
         <label className="block text-sm font-medium text-gray-700 mb-1">
