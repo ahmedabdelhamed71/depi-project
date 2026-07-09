@@ -1,5 +1,7 @@
-//Public Profile Page
-
+// Profile.jsx - Public Profile Page with Edit Functionality
+// Displays user information, skills, ratings, achievements, and swap history
+// Includes an edit mode to modify profile details
+// Props are used for dynamic data; falls back to mock data when not provided
 
 import { useState } from "react";
 import {
@@ -463,7 +465,7 @@ const Profile = ({
               ))}
               {canEdit && (
                 <Link
-                  to="/search-skill"
+                  to="https://depi-project-wme9.vercel.app/search-skill"
                   className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 rounded-xl text-sm text-gray-400 hover:text-blue-500 transition-all"
                 >
                   <MdAdd className="text-lg" />
@@ -509,7 +511,7 @@ const Profile = ({
               ))}
               {canEdit && (
                 <Link
-                  to="/discover"
+                  to="https://depi-project-wme9.vercel.app/discover"
                   className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-violet-300 rounded-xl text-sm text-gray-400 hover:text-violet-500 transition-all"
                 >
                   <MdAdd className="text-lg" />
