@@ -11,9 +11,8 @@ import { useAuth } from "../context/context";
 const Schema = yup.object({
   email: yup
     .string()
-    //.required("Email is required")
-    //.email("Email is not valid"),
-   .required("Username is required"),
+    .required("Email is required")
+    .email("Email is not valid"),
 
   password: yup
     .string()
@@ -34,24 +33,33 @@ const Login = () => {
   });
 
   const userSubmit = async (data) => {
-  try {
-    const req = await fetch("https://dummyjson.com/user/login", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: data.email,
-        password: data.password,
-      }),
-    });
+    try {
+      const req = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
 
-    const { accessToken } = await req.json();
+      const res = await req.json();
 
-    login(accessToken);
-    navigate("/");
-  } catch (e) {
-    console.log(e.message);
-  }
-};
+      if (!req.ok) {
+        alert(res.msg || "Login failed");
+        return;
+      }
+
+      login(res.user);
+      navigate("/");
+    } catch (e) {
+      console.log(e.message);
+      alert("Something went wrong");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -62,9 +70,7 @@ const Login = () => {
         <div className="flex items-center justify-center gap-2 mb-4">
           <MdOutlineSwapCalls className="text-indigo-600 text-3xl" />
 
-          <h2 className="text-2xl font-bold text-gray-800">
-            SkillSwap
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">SkillSwap</h2>
         </div>
 
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
@@ -82,14 +88,12 @@ const Login = () => {
         <input
           {...register("email")}
           className="w-full h-11 border border-gray-200 bg-white rounded-xl px-4 outline-none text-gray-700 placeholder:text-gray-400 mb-2"
-          type="text"
+          type="email"
           placeholder="you@example.com"
         />
 
         {errors.email && (
-          <p className="text-red-500 text-xs mb-2">
-            {errors.email.message}
-          </p>
+          <p className="text-red-500 text-xs mb-2">{errors.email.message}</p>
         )}
 
         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -108,19 +112,17 @@ const Login = () => {
             {errors.password.message}
           </p>
         )}
-        <div className="flex items-center justify-between mb-4">
-  <label className="flex items-center gap-2 text-sm text-gray-600">
-    <input
-      type="checkbox"
-      className="w-4 h-4 accent-indigo-500"
-    />
-    Remember me
-  </label>
 
-  <Link to='*' className="text-indigo-600 hover:underline">
-    Forgot password?
-  </Link>
-</div>
+        <div className="flex items-center justify-between mb-4">
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <input type="checkbox" className="w-4 h-4 accent-indigo-500" />
+            Remember me
+          </label>
+
+          <Link to="*" className="text-indigo-600 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
 
         <button
           type="submit"
