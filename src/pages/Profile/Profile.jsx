@@ -1,9 +1,9 @@
 // Profile.jsx - Public Profile Page with Edit Functionality
 // Displays user information, skills, ratings, achievements, and swap history
 // Includes an edit mode to modify profile details
-// Props are used for dynamic data; falls back to mock data when not provided
+// Loads the profile from GET /api/users/:id (route param) or the logged-in user
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MdEdit,
   MdSave,
@@ -22,68 +22,45 @@ import {
   MdBadge,
   MdCameraAlt,
 } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../context/context";
+import { getUser } from "../../services/api";
 
-// ─── Mock Data (Fallback) ─────────────────────────────────────────────────────
 
-const defaultUserData = {
-  _id: "user_001",
-  name: "Sarah Mohamed",
-  title: "Senior Frontend Developer & UI/UX Enthusiast",
-  location: "Cairo, Egypt",
-  joined: "January 2024",
-  about:
-    "Passionate frontend developer with over 6 years of experience building modern web applications. I specialize in React, TypeScript, and Tailwind CSS. I believe in learning by teaching and love helping others grow their coding skills. Currently looking to expand my creative abilities by learning graphic design and video editing.",
-  avatar: "SM",
-  isVerified: true,
-  isExpert: true,
-  contributionRank: "Top 5% Contributor",
-  reputation: 4.8,
-  totalReviews: 42,
-  totalSwaps: 28,
-  swapSuccessRate: 96,
-  responseTime: "< 1 hour",
-  avgSessionLength: "45 mins",
-  email: "sarah.mohamed@email.com",
-  website: "sarahdev.me",
-};
+const getInitials = (name = "") =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
 
-const defaultSkillsOffered = [
-  { _id: "s1", name: "React Development", category: "Programming", level: "Advanced", testScore: 94, isQualified: true },
-  { _id: "s2", name: "TypeScript", category: "Programming", level: "Advanced", testScore: 89, isQualified: true },
-  { _id: "s3", name: "Tailwind CSS", category: "Design", level: "Intermediate", testScore: 85, isQualified: true },
-  { _id: "s4", name: "Git & GitHub", category: "Tools", level: "Intermediate", testScore: 78, isQualified: true },
-];
+const mapApiUser = (u) => ({
+  _id: u.id,
+  name: u.full_name || "",
+  title: u.title || "",
+  location: u.location || "",
+  joined: u.joined_at
+    ? new Date(u.joined_at).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      })
+    : "",
+  about: u.bio || "",
+  avatar: getInitials(u.full_name),
+  isVerified: !!u.verified,
+  isExpert: !!u.verified_expert,
+  contributionRank: u.top_contributor ? "Top Contributor" : "",
+  reputation: u.rating ?? 0,
+  totalReviews: u.reviews_count ?? 0,
+  totalSwaps: u.total_swaps ?? 0,
+  swapSuccessRate: u.success_rate ?? 0,
+  responseTime: u.response_time || "—",
+  avgSessionLength: u.session_length || "—",
+  email: u.email || "",
+  website: u.website || "",
+});
 
-const defaultSkillsWanted = [
-  { _id: "w1", name: "Graphic Design", category: "Design", level: "Beginner" },
-  { _id: "w2", name: "Video Editing", category: "Creative", level: "Beginner" },
-  { _id: "w3", name: "Public Speaking", category: "Soft Skills", level: "Beginner" },
-  { _id: "w4", name: "Spanish Language", category: "Languages", level: "Beginner" },
-];
-
-const defaultSwaps = [
-  { _id: "sw1", partner: "Alex Rivera", partnerAvatar: "AR", skillGiven: "React Development", skillReceived: "UI Design", date: "Mar 15, 2024", rating: 5 },
-  { _id: "sw2", partner: "Priya Sharma", partnerAvatar: "PS", skillGiven: "Git & GitHub", skillReceived: "Spanish Basics", date: "Mar 10, 2024", rating: 5 },
-  { _id: "sw3", partner: "Omar Khalid", partnerAvatar: "OK", skillGiven: "TypeScript", skillReceived: "Photography", date: "Mar 5, 2024", rating: 4 },
-  { _id: "sw4", partner: "Maya Chen", partnerAvatar: "MC", skillGiven: "Tailwind CSS", skillReceived: "Figma Basics", date: "Feb 28, 2024", rating: 5 },
-];
-
-const defaultReviews = [
-  { _id: "r1", reviewer: "Alex Rivera", reviewerAvatar: "AR", rating: 5, text: "Sarah is an amazing React tutor! She explains complex concepts in a very simple and practical way. Highly recommended.", date: "Mar 16, 2024" },
-  { _id: "r2", reviewer: "Priya Sharma", reviewerAvatar: "PS", rating: 5, text: "Consistently provides high-quality technical insights and clear communication. Learned so much about Git workflows.", date: "Mar 11, 2024" },
-  { _id: "r3", reviewer: "Omar Khalid", reviewerAvatar: "OK", rating: 4, text: "Great TypeScript instructor. Very patient and thorough with explanations. Would swap again!", date: "Mar 6, 2024" },
-  { _id: "r4", reviewer: "James Wilson", reviewerAvatar: "JW", rating: 5, text: "Sarah helped me understand Tailwind CSS in just two sessions. Her teaching style is engaging and effective.", date: "Feb 20, 2024" },
-];
-
-const defaultAchievements = [
-  { _id: "a1", name: "Quick Responder", description: "Responds to requests within 1 hour", icon: "MdAccessTime" },
-  { _id: "a2", name: "Top Mentor", description: "Completed 25+ successful swaps", icon: "MdSchool" },
-  { _id: "a3", name: "Skill Verified", description: "Passed 4 qualification tests", icon: "MdVerified" },
-  { _id: "a4", name: "Rising Star", description: "Top 5% contributor this month", icon: "MdTrendingUp" },
-];
-
-// Map icon strings to components
 const iconMap = {
   MdAccessTime,
   MdSchool,
@@ -91,7 +68,6 @@ const iconMap = {
   MdTrendingUp,
 };
 
-// ─── Helper Components ─────────────────────────────────────────────────────────
 
 // Avatar with optional verified badge
 const Avatar = ({ initials, size = "md", showVerified = false }) => {
@@ -159,21 +135,78 @@ const Profile = ({
   onSave,                 // callback: (updatedData) => Promise
   onRemoveSkill,          // callback: (skillId, type) => Promise  [type: "offered" | "wanted"]
 }) => {
-  // Use props if provided, otherwise fall back to mock data
-  const [userData, setUserData] = useState(propUserData || defaultUserData);
-  const [skillsOffered, setSkillsOffered] = useState(propSkillsOffered || defaultSkillsOffered);
-  const [skillsWanted, setSkillsWanted] = useState(propSkillsWanted || defaultSkillsWanted);
-  const [swaps] = useState(propRecentSwaps || defaultSwaps);
-  const [reviewList] = useState(propReviews || defaultReviews);
-  const [achievementList] = useState(propAchievements || defaultAchievements);
+  const { id: routeUserId } = useParams();
+  const { user: authUser, loading: authLoading } = useAuth();
+
+  // Use props if provided, otherwise load from the API
+  const [userData, setUserData] = useState(propUserData || null);
+  const [skillsOffered, setSkillsOffered] = useState(propSkillsOffered || []);
+  const [skillsWanted, setSkillsWanted] = useState(propSkillsWanted || []);
+  const [swaps] = useState(propRecentSwaps || []);
+  const [reviewList] = useState(propReviews || []);
+  const [achievementList] = useState(propAchievements || []);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ ...userData });
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(!propUserData);
+  const [profileError, setProfileError] = useState(null);
+
+  // Fetch the profile: route param id (someone else) or the logged-in user
+  useEffect(() => {
+    if (propUserData) return; // parent supplied the data
+    if (authLoading) return; // wait for the auth check to finish
+
+    const targetId = routeUserId || authUser?.id || authUser?._id;
+
+    if (!targetId) {
+      setProfileError("Please log in to view your profile.");
+      setProfileLoading(false);
+      return;
+    }
+
+    let ignore = false;
+
+    const fetchProfile = async () => {
+      setProfileLoading(true);
+      setProfileError(null);
+
+      try {
+        const data = await getUser(targetId);
+
+        if (!ignore) {
+          const mapped = mapApiUser(data.user);
+          setUserData(mapped);
+          setEditData(mapped);
+        }
+      } catch (e) {
+        if (!ignore) {
+          setProfileError(
+            e.status === 404
+              ? "User not found."
+              : e.status === 401
+              ? "Please log in to view profiles."
+              : e.message || "Failed to load profile."
+          );
+        }
+      } finally {
+        if (!ignore) setProfileLoading(false);
+      }
+    };
+
+    fetchProfile();
+
+    return () => {
+      ignore = true;
+    };
+  }, [propUserData, routeUserId, authUser, authLoading]);
 
   // Determine if user can edit (owner of profile)
-  const canEdit = isOwner;
+  const authUserId = authUser?.id || authUser?._id;
+  const canEdit =
+    isOwner ||
+    (!!authUserId && (routeUserId ? routeUserId === authUserId : true));
 
   // Toggle edit mode
   const handleEditToggle = () => {
@@ -229,9 +262,42 @@ const Profile = ({
   };
 
   // Sync with prop changes (when data loads from API after initial render)
-  if (propUserData && propUserData._id !== userData._id) {
+  if (propUserData && propUserData._id !== userData?._id) {
     setUserData(propUserData);
     setEditData(propUserData);
+  }
+
+  // Loading state
+  if (profileLoading || authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin mb-4" />
+        <p className="text-sm text-gray-500">Loading profile...</p>
+      </div>
+    );
+  }
+
+  // Error / not found state
+  if (profileError || !userData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center">
+        <div className="w-14 h-14 rounded-full bg-red-50 text-red-400 text-xl flex items-center justify-center mb-4">
+          !
+        </div>
+        <h1 className="text-lg font-bold text-gray-900">
+          Couldn't load this profile
+        </h1>
+        <p className="mt-2 text-sm text-gray-500 max-w-md">
+          {profileError || "Something went wrong."}
+        </p>
+        <Link
+          to="/discover"
+          className="mt-5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
+        >
+          Back to Discover
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -434,6 +500,11 @@ const Profile = ({
               <span className="text-xs text-gray-400">{skillsOffered.length} skills</span>
             </div>
             <div className="space-y-2">
+              {skillsOffered.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4">
+                  No skills listed yet.
+                </p>
+              )}
               {skillsOffered.map((skill) => (
                 <div key={skill._id || skill.id} className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group">
                   <div className="flex items-center gap-3">
@@ -484,6 +555,11 @@ const Profile = ({
               <span className="text-xs text-gray-400">{skillsWanted.length} skills</span>
             </div>
             <div className="space-y-2">
+              {skillsWanted.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4">
+                  No skills added yet.
+                </p>
+              )}
               {skillsWanted.map((skill) => (
                 <div key={skill._id || skill.id} className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group">
                   <div className="flex items-center gap-3">
@@ -527,6 +603,11 @@ const Profile = ({
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <MdBadge className="text-amber-500" /> Achievements
           </h3>
+          {achievementList.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-4">
+              No achievements yet.
+            </p>
+          )}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {achievementList.map((achievement) => {
               const IconComponent = iconMap[achievement.icon] || MdBadge;
@@ -551,6 +632,11 @@ const Profile = ({
             </h3>
             <span className="text-xs text-gray-400">Last 30 days</span>
           </div>
+          {swaps.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-4">
+              No swaps yet.
+            </p>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {swaps.map((swap) => (
               <div key={swap._id || swap.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
@@ -581,6 +667,11 @@ const Profile = ({
             </h3>
             <span className="text-sm text-gray-400">{reviewList.length} reviews</span>
           </div>
+          {reviewList.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-4">
+              No reviews yet.
+            </p>
+          )}
           <div className="space-y-3">
             {reviewList.map((review) => (
               <div key={review._id || review.id} className="p-4 bg-gray-50 rounded-xl">
