@@ -15,6 +15,7 @@ import { RxDashboard } from "react-icons/rx";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/context/context";
+import useTheme from "../../hooks/useTheme";
 
 function NavList() {
   return (
@@ -65,7 +66,8 @@ function NavList() {
 const Header = () => {
   const [openNav, setOpenNav] = React.useState(false);
   const [openProfile, setOpenProfile] = React.useState(false);
-  const [darkMode, setDarkMode] = React.useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const darkMode = theme === "dark";
 
   const { logged, user, loading, logout } = useAuth();
   const navigate = useNavigate();
@@ -81,9 +83,7 @@ const Header = () => {
     };
   }, []);
 
-  const handleTheme = () => {
-    setDarkMode(!darkMode);
-  };
+  const handleTheme = toggleTheme;
 
   const handleLogout = async () => {
     await logout();
@@ -200,6 +200,20 @@ const Header = () => {
         <div className="hidden lg:flex items-center gap-6">
           <NavList />
 
+          {/* Theme Toggle */}
+          <IconButton
+            aria-label="Toggle dark mode"
+            variant="text"
+            className="rounded-full"
+            onClick={handleTheme}
+          >
+            {darkMode ? (
+              <IoSunnyOutline className="h-5 w-5" />
+            ) : (
+              <IoMoonOutline className="h-5 w-5" />
+            )}
+          </IconButton>
+
           {/* Buttons */}
           {!loading &&
             (logged ? (
@@ -237,20 +251,37 @@ const Header = () => {
             ))}
         </div>
 
-        {/* Mobile Icon */}
-        <IconButton
-          aria-label="Toggle navigation"
-          variant="text"
-          className="lg:hidden h-6 w-6"
-          ripple={false}
-          onClick={() => setOpenNav(!openNav)}
-        >
-          {openNav ? (
-            <TbXboxX className="h-6 w-6" />
-          ) : (
-            <CiMenuBurger className="h-6 w-6" />
-          )}
-        </IconButton>
+        {/* Mobile Icons */}
+        <div className="flex items-center gap-4 lg:hidden">
+          {/* Theme Toggle */}
+          <IconButton
+            aria-label="Toggle dark mode"
+            variant="text"
+            className="h-6 w-6"
+            ripple={false}
+            onClick={handleTheme}
+          >
+            {darkMode ? (
+              <IoSunnyOutline className="h-5 w-5" />
+            ) : (
+              <IoMoonOutline className="h-5 w-5" />
+            )}
+          </IconButton>
+
+          <IconButton
+            aria-label="Toggle navigation"
+            variant="text"
+            className="h-6 w-6"
+            ripple={false}
+            onClick={() => setOpenNav(!openNav)}
+          >
+            {openNav ? (
+              <TbXboxX className="h-6 w-6" />
+            ) : (
+              <CiMenuBurger className="h-6 w-6" />
+            )}
+          </IconButton>
+        </div>
       </div>
 
       {/* Mobile Menu */}
