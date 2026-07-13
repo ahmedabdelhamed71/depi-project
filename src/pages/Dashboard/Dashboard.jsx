@@ -1,5 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/context";
+import {
+  getUser,
+  getIncomingRequests,
+  getOutgoingRequests,
+  acceptRequest,
+  rejectRequest,
+} from "../../services/api";
 import {
 
   MdDashboard, MdExplore, MdSwapHoriz,
@@ -9,11 +17,25 @@ import {
   MdLanguage, MdTrendingUp, MdSend, MdArrowForward
 } from "react-icons/md";
 
-// ─── Dummy Data ───────────────────────────────────────────────────────────────
-const currentUser = {
-  name: "Sarah Mohamed", role: "Member", avatar: "AM",
-  reputation: 4.8, reviews: 32, badge: "Top Exchanger",
-  joined: "Jan 2024", swapsCompleted: 14,
+const getInitials = (name = "") =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+
+const timeAgo = (dateString) => {
+  if (!dateString) return "";
+  const seconds = Math.floor((Date.now() - new Date(dateString)) / 1000);
+  if (seconds < 60) return "Just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateString).toLocaleDateString();
 };
 
 const skillsOffered = [
@@ -26,18 +48,6 @@ const skillsWanted = [
   { id: 1, name: "Spanish Language", level: "Beginner",      icon: MdLanguage,   color: "green" },
   { id: 2, name: "Prompt Engineering",   level: "Beginner",      icon: MdMusicNote,  color: "pink"  },
   { id: 3, name: "Data Analysis",    level: "Intermediate",  icon: MdTrendingUp, color: "cyan"  },
-];
-
-const initialIncoming = [
-  { id: 1, name: "Ali",   avatar: "SC", skill: "React Development", time: "2h ago" },
-  { id: 2, name: "Sami",   avatar: "JO", skill: "UI/UX Design",      time: "5h ago" },
-  { id: 3, name: "Nour", avatar: "LM", skill: "Photography",        time: "1d ago" },
-];
-
-const outgoingRequests = [
-  { id: 1, name: "Brad Bitt",   avatar: "TH", skill: "Spanish Language", status: "Pending"  },
-  { id: 2, name: "Pedri", avatar: "MJ", skill: "Guitar Playing",   status: "Accepted" },
-  { id: 3, name: "Lamine Yamal",   avatar: "DK", skill: "Data Analysis",    status: "Rejected" },
 ];
 
 const suggestedMatches = [
@@ -111,37 +121,46 @@ const SkillCard = ({ skill }) => {
   );
 };
 
-// ─── Section Components ───────────────────────────────────────────────────────
-const UserOverviewCard = () => (
-  <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center text-center shadow-sm">
-    <div className="relative mb-3">
-      <Avatar initials={currentUser.avatar} size="lg" />
-      <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white" />
-    </div>
-    <h2 className="font-bold text-gray-900 text-base">{currentUser.name}</h2>
-    <span className="text-sm text-gray-500 mt-0.5">{currentUser.role} · Since {currentUser.joined}</span>
-    <div className="flex items-center gap-1 mt-2">
-      {[...Array(5)].map((_, i) => (
-        <MdStar key={i} className={`text-sm ${i < Math.floor(currentUser.reputation) ? "text-amber-400" : "text-gray-200"}`} />
-      ))}
-      <span className="text-sm font-semibold text-gray-700 ml-1">{currentUser.reputation}</span>
-      <span className="text-sm text-gray-400">({currentUser.reviews})</span>
-    </div>
-    <span className="mt-3 inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1.5 rounded-full border border-blue-100">
-      <MdBolt className="text-sm" /> {currentUser.badge}
-    </span>
-    <div className="mt-4 w-full grid grid-cols-2 gap-2">
-      <div className="bg-gray-50 rounded-xl py-2">
-        <p className="text-lg font-bold text-gray-900">{currentUser.swapsCompleted}</p>
-        <p className="text-sm text-gray-500">Swaps Done</p>
+const UserOverviewCard = ({ user }) => {
+  const name = user?.full_name || "—";
+  const joined = user?.joined_at
+    ? new Date(user.joined_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "—";
+  const rating = user?.rating ?? 0;
+  const reviews = user?.reviews_count ?? 0;
+  const badge = user?.top_contributor ? "Top Contributor" : "Member";
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col items-center text-center shadow-sm">
+      <div className="relative mb-3">
+        <Avatar initials={getInitials(name) || "?"} size="lg" />
+        <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white" />
       </div>
-      <div className="bg-gray-50 rounded-xl py-2">
-        <p className="text-lg font-bold text-gray-900">{skillsOffered.length}</p>
-        <p className="text-sm text-gray-500">Skills Listed</p>
+      <h2 className="font-bold text-gray-900 text-base">{name}</h2>
+      <span className="text-sm text-gray-500 mt-0.5">Member · Since {joined}</span>
+      <div className="flex items-center gap-1 mt-2">
+        {[...Array(5)].map((_, i) => (
+          <MdStar key={i} className={`text-sm ${i < Math.floor(rating) ? "text-amber-400" : "text-gray-200"}`} />
+        ))}
+        <span className="text-sm font-semibold text-gray-700 ml-1">{rating}</span>
+        <span className="text-sm text-gray-400">({reviews})</span>
+      </div>
+      <span className="mt-3 inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1.5 rounded-full border border-blue-100">
+        <MdBolt className="text-sm" /> {badge}
+      </span>
+      <div className="mt-4 w-full grid grid-cols-2 gap-2">
+        <div className="bg-gray-50 rounded-xl py-2">
+          <p className="text-lg font-bold text-gray-900">{user?.total_swaps ?? 0}</p>
+          <p className="text-sm text-gray-500">Swaps Done</p>
+        </div>
+        <div className="bg-gray-50 rounded-xl py-2">
+          <p className="text-lg font-bold text-gray-900">{user?.success_rate ?? 0}%</p>
+          <p className="text-sm text-gray-500">Success Rate</p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const QuickActions = () => (
   <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
@@ -228,7 +247,7 @@ const SkillsSection = ({ skillTab, setSkillTab }) => (
   </div>
 );
 
-const IncomingRequests = ({ requests, onAction }) => (
+const IncomingRequests = ({ requests, onAction, loading, actingId }) => (
   <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
     <div className="flex items-center justify-between mb-4">
       <h3 className="font-semibold text-gray-900">Incoming Requests</h3>
@@ -237,7 +256,11 @@ const IncomingRequests = ({ requests, onAction }) => (
       )}
     </div>
     <div className="space-y-3">
-      {requests.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-8 text-gray-400">
+          <p className="text-sm">Loading requests...</p>
+        </div>
+      ) : requests.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
           <MdSwapHoriz className="text-4xl mx-auto mb-2 opacity-40" />
           <p className="text-sm">No pending requests</p>
@@ -251,10 +274,10 @@ const IncomingRequests = ({ requests, onAction }) => (
             <p className="text-s text-gray-400">{r.time}</p>
           </div>
           <div className="flex gap-1.5">
-            <button onClick={() => onAction(r.id)} className="w-8 h-8 bg-emerald-50 hover:bg-blue-gray-50 text-emerald-600 hover:text-blue-500 rounded-lg flex items-center justify-center transition-all">
+            <button onClick={() => onAction(r.id, "accept")} disabled={actingId === r.id} className="w-8 h-8 bg-emerald-50 hover:bg-blue-gray-50 text-emerald-600 hover:text-blue-500 rounded-lg flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed">
               <MdCheck className="text-base" />
             </button>
-            <button onClick={() => onAction(r.id)} className="w-8 h-8 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white rounded-lg flex items-center justify-center transition-all">
+            <button onClick={() => onAction(r.id, "reject")} disabled={actingId === r.id} className="w-8 h-8 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white rounded-lg flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed">
               <MdClose className="text-base" />
             </button>
           </div>
@@ -264,7 +287,7 @@ const IncomingRequests = ({ requests, onAction }) => (
   </div>
 );
 
-const OutgoingRequests = () => (
+const OutgoingRequests = ({ requests, loading }) => (
   <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
     <div className="flex items-center justify-between mb-4">
       <h3 className="font-bold text-gray-900">Outgoing Requests</h3>
@@ -273,7 +296,16 @@ const OutgoingRequests = () => (
       </Link>
     </div>
     <div className="space-y-3">
-      {outgoingRequests.map(r => (
+      {loading ? (
+        <div className="text-center py-8 text-gray-400">
+          <p className="text-sm">Loading requests...</p>
+        </div>
+      ) : requests.length === 0 ? (
+        <div className="text-center py-8 text-gray-400">
+          <MdSend className="text-4xl mx-auto mb-2 opacity-40" />
+          <p className="text-sm">No outgoing requests</p>
+        </div>
+      ) : requests.map(r => (
         <div key={r.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
           <Avatar initials={r.avatar} size="sm" />
           <div className="flex-1 min-w-0">
@@ -321,7 +353,7 @@ const SuggestedMatches = () => (
   </div>
 );
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen, activeNav, setActiveNav, requestCount }) => (
+const Sidebar = ({ sidebarOpen, setSidebarOpen, activeNav, setActiveNav, requestCount, user }) => (
   <aside className={` fixed md:fixed top-16 left-0 h-[calc(100vh-4rem)] w-56 bg-white border-r border-gray-100 z-40 flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 `}>
     <nav className="flex-1 px-3 py-4 space-y-1">
       {navItems.map(({ label, icon: Icon, to }) => (
@@ -343,10 +375,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeNav, setActiveNav, request
     </nav>
     <div className="p-3 border-t border-gray-100">
       <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-        <Avatar initials={currentUser.avatar} size="sm" />
+        <Avatar initials={getInitials(user?.full_name) || "?"} size="sm" />
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-gray-900 truncate">{currentUser.name}</p>
-          <p className="text-sm text-gray-500">{currentUser.badge}</p>
+          <p className="text-sm font-semibold text-gray-900 truncate">{user?.full_name || "—"}</p>
+          <p className="text-sm text-gray-500">{user?.top_contributor ? "Top Contributor" : "Member"}</p>
         </div>
       </Link>
     </div>
@@ -357,9 +389,94 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav,   setActiveNav]   = useState("Dashboard");
   const [skillTab,    setSkillTab]    = useState("offer");
-  const [requests,    setRequests]    = useState(initialIncoming);
 
-  const handleRequest = (id) => setRequests(prev => prev.filter(r => r.id !== id));
+  const { user: authUser, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [incoming, setIncoming] = useState([]);
+  const [outgoing, setOutgoing] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [requestsError, setRequestsError] = useState(null);
+  const [actingId, setActingId] = useState(null);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    const userId = authUser?.id || authUser?._id;
+    let ignore = false;
+
+    const load = async () => {
+      setRequestsLoading(true);
+      setRequestsError(null);
+
+      try {
+        const [incomingData, outgoingData, profileData] = await Promise.all([
+          getIncomingRequests(),
+          getOutgoingRequests(),
+          userId ? getUser(userId) : Promise.resolve(null),
+        ]);
+
+        if (!ignore) {
+          setIncoming(incomingData.requests || []);
+          setOutgoing(outgoingData.requests || []);
+          if (profileData) setProfile(profileData.user);
+        }
+      } catch (e) {
+        if (!ignore) {
+          setRequestsError(
+            e.status === 401
+              ? "Please log in to view your dashboard."
+              : e.message || "Failed to load dashboard data."
+          );
+        }
+      } finally {
+        if (!ignore) setRequestsLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      ignore = true;
+    };
+  }, [authUser, authLoading]);
+
+  const handleRequest = async (id, action) => {
+    setActingId(id);
+    setRequestsError(null);
+
+    try {
+      const data =
+        action === "accept" ? await acceptRequest(id) : await rejectRequest(id);
+
+      setIncoming(prev => prev.map(r => (r.id === id ? data.request : r)));
+    } catch (e) {
+      setRequestsError(e.message || `Failed to ${action} request.`);
+    } finally {
+      setActingId(null);
+    }
+  };
+
+  const pendingIncoming = incoming
+    .filter(r => r.status === "pending")
+    .map(r => ({
+      id: r.id,
+      name: r.sender?.full_name || "Unknown user",
+      avatar: getInitials(r.sender?.full_name) || "?",
+      skill: r.requested_skill?.name || "—",
+      time: timeAgo(r.created_at),
+    }));
+
+  const outgoingView = outgoing.map(r => ({
+    id: r.id,
+    name: r.receiver?.full_name || "Unknown user",
+    avatar: getInitials(r.receiver?.full_name) || "?",
+    skill: r.requested_skill?.name || "—",
+    status: r.status ? r.status[0].toUpperCase() + r.status.slice(1) : "Pending",
+  }));
+
+  const firstName =
+    (profile?.full_name || authUser?.full_name || authUser?.username || "there")
+      .split(" ")[0];
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -371,7 +488,8 @@ const Dashboard = () => {
       <Sidebar
         sidebarOpen={sidebarOpen}  setSidebarOpen={setSidebarOpen}
         activeNav={activeNav}      setActiveNav={setActiveNav}
-        requestCount={requests.length}
+        requestCount={pendingIncoming.length}
+        user={profile}
       />
 
       <main className="md:ml-56 pt-10 min-h-screen">
@@ -387,16 +505,29 @@ const Dashboard = () => {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Good morning, {currentUser.name.split(" ")[0]} 👋</h1>
-              <p className="text-sm text-gray-500 mt-0.5">You have {requests.length} pending swap requests</p>
+              <h1 className="text-xl font-bold text-gray-900">Good morning, {firstName} 👋</h1>
+              <p className="text-sm text-gray-500 mt-0.5">You have {pendingIncoming.length} pending swap requests</p>
             </div>
             <Link to="/profile" className="hidden sm:flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-sm">
               <MdAdd className="text-lg" /> Add Skill
             </Link>
           </div>
 
+          {requestsError && (
+            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 flex items-center justify-between">
+              <span>{requestsError}</span>
+              <button
+                onClick={() => setRequestsError(null)}
+                className="text-red-400 hover:text-red-600 ml-4"
+                aria-label="Dismiss"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <UserOverviewCard />
+            <UserOverviewCard user={profile} />
             <QuickActions />
             <StatsCard />
           </div>
@@ -404,8 +535,13 @@ const Dashboard = () => {
           <SkillsSection skillTab={skillTab} setSkillTab={setSkillTab} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <IncomingRequests requests={requests} onAction={handleRequest} />
-            <OutgoingRequests />
+            <IncomingRequests
+              requests={pendingIncoming}
+              onAction={handleRequest}
+              loading={requestsLoading}
+              actingId={actingId}
+            />
+            <OutgoingRequests requests={outgoingView} loading={requestsLoading} />
           </div>
 
           <SuggestedMatches />
