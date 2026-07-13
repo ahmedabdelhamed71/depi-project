@@ -4,6 +4,7 @@ function QuestionOptions({
   currentQuestion,
   answers,
   setAnswers,
+  question,
 }) {
   return (
     <div className="space-y-4">
@@ -21,10 +22,13 @@ function QuestionOptions({
             type="radio"
             name="answer"
             checked={selectedAnswer === option}
-            onChange={() =>
-              setAnswers({
-                ...answers,
-                [currentQuestion]: option,
+           onChange={() =>
+           setAnswers({
+           ...answers,
+           [currentQuestion]: {
+            questionId: question._id,
+             answer: option,
+              },
               })
             }
           />
