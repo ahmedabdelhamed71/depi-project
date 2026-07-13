@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate , useLocation } from "react-router-dom";
-import questions from "../../data/questions";
+import questions from "../../data/questions"; 
+
 
 function TestSelection() {
   const navigate = useNavigate();
   const location = useLocation() ;
- const skill = location.state?.skill || "JavaScript";
-  const [selection, setSelection] = useState("");
+  const skill = location.state?.skill; 
+
+
+useEffect(() => {
+  if (!skill) {
+    navigate("/search-skill");
+  }
+  }, [skill, navigate]);  
+
+
+  const [selection, setSelection] = useState("");  
 
   const handleNext = () => {
     if (selection === "now") {
@@ -30,12 +40,12 @@ function TestSelection() {
       <div className="max-w-6xl mx-auto mt-8 bg-white rounded-xl shadow-sm border p-8">
 
         <h1 className="text-4xl font-bold mb-4">
-          {skill} Basics Test 
+          {skill.name} Basics Test 
         </h1>
 
         <p className="text-gray-600 mb-10">
-          A test is required to verify your skill in {skill}.
-          The test consists of {questions.length} questions (MCQ)
+          A test is required to verify your skill in {skill.name}.
+          The test consists of {skill.mcqCount} questions (MCQ)
           to be completed within a 15-minute time limit.
         </p>
 

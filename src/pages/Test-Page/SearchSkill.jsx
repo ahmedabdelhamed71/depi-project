@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
@@ -6,19 +6,33 @@ import { useNavigate } from "react-router-dom";
 function SearchSkill() {
   const navigate = useNavigate();
 
-  const skills = [
-    "JavaScript",
-    "Python",
-    "Web Development",
-    "Photography",
-    "UI/UX",
-    "React",
-  ];
+ 
 
-  const [selectedSkill, setSelectedSkill] = useState("");
+  const [selectedSkill, setSelectedSkill] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); 
-  const filteredSkills = skills.filter((skill) =>
-  skill.toLowerCase().includes(searchTerm.toLowerCase()));
+  const [skills, setSkills] = useState([]); 
+  useEffect(() => {
+  const getSkills = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/skills");
+
+      const data = await response.json(); 
+      console.log("Response:", response.status);
+      console.log("Data:", data);
+
+      setSkills(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getSkills();
+}, []);
+
+
+ const filteredSkills = skills.filter((skill) =>
+  skill.name.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   return (
     <div className="min-h-screen bg-[#F5F7FC]">
@@ -48,19 +62,18 @@ function SearchSkill() {
 
         <div className="flex flex-wrap gap-3 mb-8">
 
-         {filteredSkills.length > 0 ? (
+        {filteredSkills.length > 0 ? (
   filteredSkills.map((skill) => (
     <button
-      key={skill}
+      key={skill._id}
       onClick={() => setSelectedSkill(skill)}
-      className={`px-5 py-2 rounded-full border transition
-        ${
-          selectedSkill === skill
-            ? "bg-[#2143D8] text-white"
-            : "bg-gray-100 hover:bg-gray-200"
-        }`}
+      className={`px-5 py-2 rounded-full border transition ${
+        selectedSkill?._id === skill._id
+          ? "bg-[#2143D8] text-white"
+          : "bg-gray-100 hover:bg-gray-200"
+      }`}
     >
-      {skill}
+      {skill.name}
     </button>
   ))
 ) : (
@@ -68,19 +81,18 @@ function SearchSkill() {
     No skills found.
   </p>
 )}
-
         </div>
 
         {selectedSkill && (
           <div className="border rounded-xl p-5 w-[320px] mb-8">
 
             <h2 className="font-bold text-2xl mb-3">
-              {selectedSkill}
+              {selectedSkill.name}
             </h2>
 
             <p className="text-gray-600">
-              Add {selectedSkill} to your profile?
-              A 10 MCQ test (15 min) is required.
+              Add {selectedSkill.name} to your profile?
+             A {selectedSkill.mcqCount} MCQ test (15 min) is required.
             </p>
 
           </div>
