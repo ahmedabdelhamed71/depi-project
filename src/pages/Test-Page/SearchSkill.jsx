@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { getSkills } from "../../services/api";
 
 
 function SearchSkill() {
@@ -11,22 +12,17 @@ function SearchSkill() {
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); 
   const [skills, setSkills] = useState([]); 
-  useEffect(() => {
-  const getSkills = async () => {
+ useEffect(() => {
+  const getSkillsData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/skills");
-
-      const data = await response.json(); 
-      console.log("Response:", response.status);
-      console.log("Data:", data);
-
+      const data = await getSkills();
       setSkills(data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  getSkills();
+  getSkillsData();
 }, []);
 
 
