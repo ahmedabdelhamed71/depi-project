@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { getCurrentUser, logoutUser } from "../../services/api";
 
 const Context = createContext();
 
@@ -14,14 +15,7 @@ export const AuthContext = ({ children }) => {
 
   const logout = async () => {
     try {
-      const req = await fetch("http://localhost:3000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!req.ok) {
-        console.log("Logout failed");
-      }
+      await logoutUser();
 
       setLogged(false);
       setUser(null);
@@ -34,31 +28,22 @@ export const AuthContext = ({ children }) => {
   };
 
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const req = await fetch("http://localhost:3000/api/auth/me", {
-          credentials: "include",
-        });
+  const checkUser = async () => {
+    try {
+      const res = await getCurrentUser();
 
-        const res = await req.json();
+      setLogged(true);
+      setUser(res.user);
+    } catch (e) {
+      setLogged(false);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        if (req.ok) {
-          setLogged(true);
-          setUser(res.user);
-        } else {
-          setLogged(false);
-          setUser(null);
-        }
-      } catch (e) {
-        setLogged(false);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-  }, []);
+  checkUser();
+}, []);
 
   return (
     <Context.Provider

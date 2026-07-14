@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useAuth } from "../context/context";
+import { loginUser } from "../../services/api";
 
 
 const Schema = yup.object({
@@ -33,33 +34,19 @@ const Login = () => {
   });
 
   const userSubmit = async (data) => {
-    try {
-      const req = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
+  try {
+    const res = await loginUser({
+      email: data.email,
+      password: data.password,
+    });
 
-      const res = await req.json();
-
-      if (!req.ok) {
-        alert(res.msg || "Login failed");
-        return;
-      }
-
-      login(res.user);
-      navigate("/");
-    } catch (e) {
-      console.log(e.message);
-      alert("Something went wrong");
-    }
-  };
+    login(res.user);
+    navigate("/");
+  } catch (e) {
+    console.log(e.message);
+    alert("Something went wrong");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
