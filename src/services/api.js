@@ -36,6 +36,12 @@ export const getUsers = ({ page = 1, limit = 10, search = '' } = {}) => {
 
 export const getUser = (id) => apiFetch(`/users/${id}`);
 
+export const updateUser = (id, userData) =>
+  apiFetch(`/users/${id}`, {
+    method: 'PUT',
+    body: userData,
+  });
+
 export const createRequest = ({ receiver, skill, message }) =>
   apiFetch('/requests', { method: 'POST', body: { receiver, skill, message } });
 
