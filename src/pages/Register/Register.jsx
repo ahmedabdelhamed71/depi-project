@@ -5,6 +5,7 @@ import { MdOutlineSwapCalls } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { registerUser } from "../../services/api";
 
 const Schema = yup.object({
   username: yup.string().required("Full name is required"),
@@ -36,32 +37,20 @@ const Register = () => {
     resolver: yupResolver(Schema),
   });
 
-  const userSubmit = async (data) => {
-    try {
-      const req = await fetch("http://localhost:3000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          username: data.username,
-          email: data.email,
-          password: data.password,
-        }),
-      });
+ const userSubmit = async (data) => {
+  try {
+    const result = await registerUser({
+      username: data.username,
+      email: data.email,
+      password: data.password,
+    });
 
-      const result = await req.json();
-
-      if (!req.ok) {
-        console.log(result.msg);
-        return;
-      }
-
-      console.log(result);
-      navigate("/login");
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
+    console.log(result);
+    navigate("/login");
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
