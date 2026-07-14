@@ -2,22 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ------------------------------------------------------------------------
-   Dark theme layer
-   ------------------------------------------------------------------------
-   Strategy: the app is styled with plain Tailwind utilities (bg-white,
-   text-gray-700, ...). Instead of adding `dark:` variants to every
-   component, we remap the color utilities actually used in the codebase
-   from this single place whenever `<html>` has the `dark` class
-   (see the pre-paint script in index.html and src/hooks/useTheme.js).
-
-   `.dark .bg-white` (specificity 0,2,0) always wins over the utility
-   (0,1,0), so no !important is needed and light mode is untouched.
-
-   Scalability: the palette lives in CSS variables (RGB triplets so
-   Tailwind's opacity modifiers keep working). A future theme = one more
-   class on <html> redefining the same variables.
-   ------------------------------------------------------------------------ */
 
 .dark {
   /* Palette (RGB triplets) */
