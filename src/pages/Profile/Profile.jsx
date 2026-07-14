@@ -24,7 +24,7 @@ import {
 } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../context/context";
-import { getUser } from "../../services/api";
+import { getUser, updateUser } from "../../services/api";
 
 
 const getInitials = (name = "") =>
@@ -150,6 +150,7 @@ const Profile = ({
   const [editData, setEditData] = useState({ ...userData });
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [profileLoading, setProfileLoading] = useState(!propUserData);
   const [profileError, setProfileError] = useState(null);
 
@@ -221,26 +222,44 @@ const Profile = ({
 
   // Save edited data
   const handleSave = async () => {
-    // Basic validation
-    if (!editData.name?.trim()) return;
+  if (!editData.name?.trim()) {
+    setSaveError("Full name is required.");
+    return;
+  }
 
-    setSaveLoading(true);
+  setSaveLoading(true);
+  setSaveError("");
+  setSaveSuccess(false);
 
-    try {
-      // If onSave callback provided (API), use it; otherwise update locally
-      if (onSave) {
-        await onSave(editData);
-      }
-      setUserData({ ...editData });
-      setIsEditing(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (error) {
-      console.error("Failed to save profile:", error);
-    } finally {
-      setSaveLoading(false);
-    }
-  };
+  try {
+    const targetId = userData._id || routeUserId || authUserId;
+
+    const payload = {
+      full_name: editData.name.trim(),
+      title: editData.title?.trim() || "",
+      location: editData.location?.trim() || "",
+      bio: editData.about?.trim() || "",
+      email: editData.email?.trim() || "",
+      website: editData.website?.trim() || "",
+    };
+
+    const data = await updateUser(targetId, payload);
+    const mappedUser = mapApiUser(data.user);
+
+    setUserData(mappedUser);
+    setEditData(mappedUser);
+    setIsEditing(false);
+    setSaveSuccess(true);
+
+    setTimeout(() => {
+      setSaveSuccess(false);
+    }, 3000);
+  } catch (error) {
+    setSaveError(error.message || "Failed to save profile.");
+  } finally {
+    setSaveLoading(false);
+  }
+};
 
   // Handle input changes during edit
   const handleInputChange = (e) => {
@@ -319,6 +338,12 @@ const Profile = ({
             <MdCheckCircle className="text-lg" /> Profile saved successfully!
           </div>
         )}
+        {/* error message */}
+        {saveError && (
+         <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+         {saveError}
+         </div>
+         )}
 
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
@@ -391,7 +416,7 @@ const Profile = ({
                     <button
                       onClick={handleSave}
                       disabled={saveLoading}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-medium hover:bg-emerald-600 transition-all shadow-sm disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 text-white dark:bg-emerald-600 dark:text-white rounded-xl text-sm font-semibold hover:bg-emerald-800 dark:hover:bg-emerald-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <MdSave className="text-lg" /> {saveLoading ? "Saving..." : "Save"}
                     </button>

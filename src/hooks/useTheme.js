@@ -2,16 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 
 const THEME_KEY = "theme";
 
-/**
- * Centralized theme state.
- *
- * - Initial theme is applied before first paint by the inline script in
- *   index.html (localStorage first, system preference as fallback).
- * - Toggling flips the `dark` class on <html>; all colors are remapped by
- *   the CSS layer in index.css, so no other component re-renders.
- * - The choice is persisted only when the user explicitly toggles; until
- *   then the app keeps following the OS theme, live.
- */
 export default function useTheme() {
   const [theme, setTheme] = useState(() =>
     document.documentElement.classList.contains("dark") ? "dark" : "light"
