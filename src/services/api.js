@@ -69,6 +69,18 @@ export const updateUser = (id, userData) =>
     body: userData,
   });
 
+  // Skills API
+export const getSkills = () => apiFetch("/skills");
+
+export const getQuestionsBySkill = (skillId) =>
+  apiFetch(`/questions/${skillId}`);
+
+export const submitTestResult = ({ skillId, answers }) =>
+  apiFetch("/results", {
+    method: "POST",
+    body: { skillId, answers },
+  });
+
 // Requests API
 export const createRequest = ({ receiver, skill, message }) =>
   apiFetch("/requests", {

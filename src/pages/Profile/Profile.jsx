@@ -561,7 +561,7 @@ const Profile = ({
               ))}
               {canEdit && (
                 <Link
-                  to="https://depi-project-wme9.vercel.app/search-skill"
+                  to="/search-skill"
                   className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-blue-300 rounded-xl text-sm text-gray-400 hover:text-blue-500 transition-all"
                 >
                   <MdAdd className="text-lg" />
@@ -612,7 +612,7 @@ const Profile = ({
               ))}
               {canEdit && (
                 <Link
-                  to="https://depi-project-wme9.vercel.app/discover"
+                  to="/discover"
                   className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 hover:border-violet-300 rounded-xl text-sm text-gray-400 hover:text-violet-500 transition-all"
                 >
                   <MdAdd className="text-lg" />

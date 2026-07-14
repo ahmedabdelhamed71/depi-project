@@ -4,6 +4,7 @@ import QuestionOptions from "../../components/QuestionOptions";
 import QuestionCard from "../../components/QuestionCard";
 import ProgressBar from "../../components/ProgressBar";
 import { useNavigate, useLocation } from "react-router-dom";
+import {getQuestionsBySkill,submitTestResult,} from "../../services/api";
 
 function SkillTest() {
   const navigate = useNavigate();
@@ -19,23 +20,19 @@ function SkillTest() {
 
   
   useEffect(() => {
-    const getQuestions = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/questions/${skillId}`
-        );
-
-        const data = await response.json();
-        setQuestions(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    if (skillId) {
-      getQuestions();
+  const getQuestions = async () => {
+    try {
+      const data = await getQuestionsBySkill(skillId);
+      setQuestions(data);
+    } catch (error) {
+      console.log(error);
     }
-  }, [skillId]);
+  };
+
+  if (skillId) {
+    getQuestions();
+  }
+}, [skillId]);
 
   
   useEffect(() => {
@@ -45,34 +42,23 @@ function SkillTest() {
   }, [skill, navigate]);
 
   
-  const submitTest = async () => {
-    try {
-      const token = localStorage.getItem("token");
+ const submitTest = async () => {
+  try {
+    const data = await submitTestResult({
+      skillId: skill._id,
+      answers: Object.values(answers),
+    });
 
-      const response = await fetch("http://localhost:5000/api/results", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          skillId: skill._id,
-          answers: Object.values(answers),
-        }),
-      });
-
-      const data = await response.json();
-
-      navigate("/result", {
-        state: {
-          result: data.result,
-          skill,
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    navigate("/result", {
+      state: {
+        result: data.result,
+        skill,
+      },
+    });
+  } catch (error) {
+    console.log("Submit result error:", error);
+  }
+};
 
   
   useEffect(() => {
